@@ -1,6 +1,7 @@
 import React from 'react'
 import KycUpload from './components/KycUpload.jsx'
 import RiskDashboard from './components/RiskDashboard.jsx'
+import CsvRiskUpload from './components/CsvRiskUpload.jsx'
 import './styles.css'
 
 export default function FraudDashboardApp(){
@@ -15,6 +16,7 @@ export default function FraudDashboardApp(){
 
       <div className="grid grid-2">
         <KycUpload />
+        <CsvRiskUpload />
         <RiskDashboard />
       </div>
     </div>

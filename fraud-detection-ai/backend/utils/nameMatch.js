@@ -123,6 +123,38 @@ export function compareNames(profileName, docName, aliases = [], threshold = 0.8
   const docIsLong = docStr.length > 80 || /\n/.test(docStr);
   const docCandidates = docIsLong ? ocrNameCandidates(docStr) : [docStr];
 
+  // 1) Regex-tolerant early match: if tokens of the profile name appear in order
+  // with minor noise (spaces/punct) between them, treat as a strong match.
+  const makeTolerantRegex = (name) => {
+    const toks = normalizeTokens(tokenize(name)).filter(Boolean);
+    if (toks.length === 0) return null;
+    // Allow up to 3 non-letters between tokens; require alpha tokens to appear in order
+    const body = toks.map(t => t.replace(/[^a-z]/g, '')).filter(Boolean).join('[^a-z]{0,3}');
+    if (!body) return null;
+    try { return new RegExp(body, 'i'); } catch { return null; }
+  };
+  for (const cand of candidates) {
+    const rx = makeTolerantRegex(cand);
+    if (!rx) continue;
+    for (const docCand of docCandidates) {
+      const plain = collapseSpaces(stripPunct(unicodeNorm(String(docCand || '')))).replace(/\s+/g,'');
+      const lettersOnly = plain.replace(/[^a-z]/gi, '');
+      if (rx.test(lettersOnly)) {
+        const score = 0.99; // strong regex hit
+        const passed = score >= threshold;
+        logger && logger.info && logger.info('[KYC:name] regex-match', {
+          profileCandidates: candidates,
+          testedWith: cand,
+          threshold,
+          bestScore: Number(score.toFixed(4)),
+          matchedWith: cand,
+          docMatchedFragment: docCand
+        });
+        return { passed, score, matchedWith: cand };
+      }
+    }
+  }
+
   let best = { score: 0, candidate: null, docCandidate: null };
 
   for (const cand of candidates) {

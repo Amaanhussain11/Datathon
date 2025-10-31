@@ -8,6 +8,7 @@ import kycRoutes from './routes/kycRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
 import riskRoutes from './routes/riskRoutes.js';
 import fs from 'fs';
+import uploadRoute from './routes/uploadRoute.js';
 
 dotenv.config();
 const app = express();
@@ -35,6 +36,7 @@ try { fs.mkdirSync('uploads', { recursive: true }); } catch {}
 app.use('/api/kyc', kycRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/risk-summary', riskRoutes);
+app.use('/api/upload', uploadRoute);
 
 app.get('/api/health', (req, res) => res.json({ ok: true, service: 'fraud-detection-backend' }));
 
