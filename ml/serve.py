@@ -10,7 +10,12 @@ import pandas as pd
 import shap
 from fastapi import FastAPI
 from pydantic import BaseModel
-from features import compute_features
+try:
+    # When running as a package: uvicorn ml.serve:app
+    from .features import compute_features  # type: ignore
+except Exception:
+    # When running from inside ml/: uvicorn serve:app
+    from features import compute_features
 
 FEATURES = ['monthly_avg_income','income_volatility','ontime_pct','cash_ratio','merchant_diversity','night_txn_ratio']
 

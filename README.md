@@ -1,4 +1,59 @@
 # Alternative Credit Scoring Engine MVP
+## AI Financial Mentor (Offline-first, Hindi/Hinglish)
+
+This feature adds a local, rule-based chatbot that explains EMI, loans, savings, credit score logic, and simple investments in Hindi/Hinglish. It works without any external LLM.
+
+### Project tree (new)
+```
+backend/
+  package.json
+  src/
+    index.js
+    rule_engine.js
+    utils/emi.js
+    kb/hindi_v1.json
+    tests/rule_engine.test.js
+frontend/
+  package.json
+  index.html
+  public/manifest.json
+  public/service-worker.js
+  src/main.jsx
+  src/App.jsx
+  src/styles.css
+  src/components/ChatBox.jsx
+  src/components/Message.jsx
+  src/components/VoiceToggle.jsx
+  src/services/chatService.js
+```
+
+### Backend (Express)
+- Start: `cd backend && npm i && npm run dev`
+- Endpoint: `POST /api/chat` with `{ text, lang, meta }` → `{ answer, intent, meta }`
+- Health: `GET /api/health`
+- KB for offline frontend: `GET /api/kb`
+
+### Frontend (Vite React)
+- Start: `cd frontend && npm i && npm run dev`
+- Single-page chat UI with voice toggle, offline caching, and local history.
+
+### cURL examples
+```
+curl -X POST http://localhost:4000/api/chat -H 'Content-Type: application/json' \
+  -d '{"text":"EMI kya hai","meta":{"P":100000,"r":8,"n":24}}'
+
+curl -X POST http://localhost:4000/api/chat -H 'Content-Type: application/json' \
+  -d '{"text":"Mera score kaise banta hai"}'
+```
+
+### Tests
+```
+cd backend
+npm test
+```
+
+Note: If another server is already running on 4000, stop it before starting the `backend/` server.
+
 
 Demo-ready project with three services:
 

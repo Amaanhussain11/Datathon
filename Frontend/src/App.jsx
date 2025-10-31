@@ -1,19 +1,30 @@
-import React, { useEffect, useState } from 'react'
-import { api } from './api'
+import React, { useState } from 'react'
+import UploadAndScore from './components/UploadAndScore.jsx'
+import MentorChatBox from './components/MentorChatBox.jsx'
+import FraudDashboardApp from './fraud/App.jsx'
 
 export default function App() {
-  const [status, setStatus] = useState('loading...')
-
-  useEffect(() => {
-    api.get('/api/health')
-      .then(res => setStatus(`${res.status} - ${res.data.status}`))
-      .catch(() => setStatus('error'))
-  }, [])
-
+  const [tab, setTab] = useState('score')
   return (
-    <div style={{ fontFamily: 'ui-sans-serif, system-ui', padding: 24 }}>
-      <h1>MERN Starter</h1>
-      <p>Backend health: {status}</p>
+    <div className="container">
+      <h1>Alternative Credit Scoring MVP</h1>
+      <p>Paste JSON transactions or load a demo payload and calculate a score. Or switch to the AI Mentor for Hindi/Hinglish guidance.</p>
+
+      <div className="btn-group" style={{marginTop:12}}>
+        <button className={tab==='score'? '': 'ghost'} onClick={()=>setTab('score')}>Scoring</button>
+        <button className={tab==='mentor'? '': 'ghost'} onClick={()=>setTab('mentor')}>AI Mentor (Hindi)</button>
+        <button className={tab==='fraud'? '': 'ghost'} onClick={()=>setTab('fraud')}>Fraud Detection</button>
+      </div>
+
+      {tab === 'score' ? (
+        <UploadAndScore />
+      ) : (
+        tab === 'mentor' ? (
+          <MentorChatBox />
+        ) : (
+          <FraudDashboardApp />
+        )
+      )}
     </div>
   )
 }

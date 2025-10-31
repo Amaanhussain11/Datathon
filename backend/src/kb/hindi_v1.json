@@ -1,0 +1,13 @@
+{
+  "language": "hi",
+  "intents": {
+    "emi_explain": "EMI ka matlab hai Equal Monthly Installment. Agar aap {P} rupay ka loan lete ho, rate {r_percent}% aur {n_months} months ke liye, to approx EMI: {emi}. Isse har mahine same amount dena hota hai.",
+    "loan_explain": "Loan lene se pehle 3 cheezein samjho: (1) Interest rate aur processing fees, (2) Tenure jitna bada hoga, EMI kam par total interest zyada, (3) Prepayment/foreclosure rules. Hamesha documents dhyaan se padho.",
+    "investment_basic": "Investment ke basics: pehle emergency fund banao (3-6 months expenses). Phir low-cost index funds/SIP se shuru karo. Short term ke liye FD/recurring, long term ke liye equity SIP. Risk samajh ke hi invest karo.",
+    "credit_score_explain": "Credit score in factors se banta hai: on-time payments (sabse important), income stability, cash use kam, merchant diversity, raat ko zyada spends avoid, aur regular inflow. Inhe sudharo to score improve hota hai.",
+    "score_simulate": "Aapke diye gaye features ke basis par humne score calculate kiya hai. Neeche points dekhiye.",
+    "budgeting_tips": "Monthly budget banao: 50/30/20 rule (50% needs, 30% wants, 20% savings). Auto-SIP set karo, cash spends track karo, impulse shopping avoid karo.",
+    "saving_tips": "Saving shuru karo salary aate hi (Pay yourself first). Recurring deposit/SIP set karo. High-interest debt pehle clear karo.",
+    "fallback": "Maaf kijiye, mujhe samajh nahi aaya. Aap EMI, loan, saving, ya credit score ke baare me puchh sakte ho."
+  }
+}
