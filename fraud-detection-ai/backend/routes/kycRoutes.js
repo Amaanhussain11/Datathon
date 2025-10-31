@@ -2,13 +2,13 @@ import { Router } from 'express';
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { extractText } from '../services/ocrService.js';
 import { sha256File } from '../services/hashService.js';
 import { store } from '../services/store.js';
+import { compareNames } from '../utils/nameMatch.js';
 
-const router = Router();
-const upload = multer({ dest: 'uploads/' });
+  const router = Router();
+  const upload = multer({ dest: 'uploads/' });
 
 // Use shared store
 
@@ -90,7 +90,15 @@ router.post('/', upload.single('file'), async (req, res) => {
     const extracted_pan = extractPAN(ocrText);
     const panValid = !!extracted_pan;
     const name = (req.body.name || '').trim();
-    const nameConsistent = !name || new RegExp(name, 'i').test(ocrText);
+    const aliases = Array.isArray(req.body.aliases)
+      ? req.body.aliases.filter(Boolean)
+      : (req.body.aliases ? [req.body.aliases] : []);
+    const NAME_THRESHOLD = Number(process.env.KYC_NAME_THRESHOLD || '0.80');
+    // Compare provided profile name against OCR text using normalized fuzzy match.
+    const cmp = name
+      ? compareNames(name, ocrText, aliases, NAME_THRESHOLD, console)
+      : { passed: true, score: 0, matchedWith: null };
+    const nameConsistent = !!cmp.passed;
 
     const hash = await sha256File(absPath);
 
@@ -109,7 +117,19 @@ router.post('/', upload.single('file'), async (req, res) => {
     if (name && !nameConsistent) alerts.push('Name mismatch');
     if (tamperSuspicious) alerts.push('Possible image tampering (low OCR text)');
 
-    const payload = { user_id, kyc_fraud_score, kyc_verified: kyc_fraud_score < 0.5, alerts, panValid, extracted_pan, hash };
+    const payload = {
+      user_id,
+      kyc_fraud_score,
+      kyc_verified: kyc_fraud_score < 0.5,
+      alerts,
+      panValid,
+      extracted_pan,
+      hash,
+      // Debug/trace fields for demo visibility
+      kyc_name_score: Number((cmp?.score || 0).toFixed(4)),
+      kyc_name_threshold: NAME_THRESHOLD,
+      kyc_name_matched_with: cmp?.matchedWith || null
+    };
     store.kyc.set(user_id, payload);
 
     // Cleanup temp file
