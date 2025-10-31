@@ -7,8 +7,18 @@
 # Python
 __pycache__/
 *.pyc
-ml/models/
+ 
+# ML artifacts
 ml/data/
+# Ignore large model artifacts by default but keep the demo model
+ml/models/*
+!ml/models/.gitkeep
+!ml/models/xgb_model.joblib
+# Optional: other heavy formats remain ignored
+ml/models/*.ckpt
+ml/models/*.pt
+ml/models/*.pkl
+ml/models/*.onnx
 # OS / Editors
 .DS_Store
 Thumbs.db
