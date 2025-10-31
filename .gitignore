@@ -9,14 +9,42 @@ __pycache__/
 *.pyc
 ml/models/
 ml/data/
-# OS
+# OS / Editors
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
+ 
 # Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+ 
 # Build outputs
-/dist/
-/build/
+dist/
+build/
+Frontend/dist/
+server/dist/
+ 
+# Virtual envs
+ml/venv/
+**/.venv/
+ 
+# Node modules (explicit per package)
+server/node_modules/
+Frontend/node_modules/
+fraud-detection-ai/**/node_modules/
+ 
+# Environment files
+Frontend/.env
+server/.env
+fraud-detection-ai/**/.env
+ 
+# Caches & coverage
+.coverage
+coverage/
+.pytest_cache/
+.mypy_cache/
+.cache/
