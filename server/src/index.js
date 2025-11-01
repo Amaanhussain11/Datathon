@@ -18,8 +18,16 @@ const PORT = process.env.PORT || 4000
 
 // Middleware
 app.use(cors())
-// Handle preflight for all routes (important for Vercel -> Render cross-origin requests)
-app.options('*', cors())
+// Explicit CORS headers for proxies that strip defaults. Also handle OPTIONS here
+app.use((req, res, next) => {
+  const origin = process.env.CORS_ORIGIN || '*'
+  res.header('Access-Control-Allow-Origin', origin)
+  res.header('Vary', 'Origin')
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS')
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+  if (req.method === 'OPTIONS') return res.sendStatus(204)
+  next()
+})
 app.use(bodyParser.json({ limit: '2mb' }))
 app.use(bodyParser.urlencoded({ extended: true }))
 
