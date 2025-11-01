@@ -8,6 +8,7 @@ import UploadAndScore from '../components/UploadAndScore.jsx';
 import MentorChatBox from '../components/MentorChatBox.jsx';
 import FraudDashboardApp from '../fraud/App.jsx';
 import GamesTab from './GamesTab.jsx';
+import OpenBankingAPIPage from './dashboard/OpenBankingAPIPage.jsx';
 
 export default function DashboardPage(){
   const [data, setData] = useState(mockDashboardData);
@@ -60,6 +61,11 @@ export default function DashboardPage(){
         </section>
         <section style={{display: activeTab==='games' ? 'block' : 'none'}}>
           <GamesTab />
+        </section>
+        <section style={{display: activeTab==='api' ? 'block' : 'none'}}>
+          <div className="card" style={{padding:0, background:'transparent'}}>
+            <OpenBankingAPIPage />
+          </div>
         </section>
       </main>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import ScoreCard from './ScoreCard.jsx'
+import ApiConsole from './ApiConsole.jsx'
 
 const DEMOS = {
   salaried: {
@@ -163,6 +164,8 @@ export default function UploadAndScore() {
           {result && <ScoreCard result={result} />}
         </div>
       </div>
+      {/* API Console section */}
+      <ApiConsole />
     </div>
   )
 }
