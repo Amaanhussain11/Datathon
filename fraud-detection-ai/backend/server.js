@@ -15,8 +15,16 @@ const app = express();
 const PORT = process.env.PORT || 4800;
 
 app.use(cors());
-// Handle CORS preflight for all routes
-app.options('*', cors());
+// Explicit CORS headers for all responses and handle OPTIONS
+app.use((req, res, next) => {
+  const origin = process.env.CORS_ORIGIN || '*';
+  res.header('Access-Control-Allow-Origin', origin);
+  res.header('Vary', 'Origin');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 app.use(express.json({ limit: '2mb' }));
 
 // Mongo connection (optional). If no URI, continue without failing.
