@@ -49,6 +49,23 @@ app.use('/api/risk-summary', riskRoutes);
 app.use('/api/upload', uploadRoute);
 
 app.get('/api/health', (req, res) => res.json({ ok: true, service: 'fraud-detection-backend' }));
+// Friendly root route
+app.get('/', (req, res) => {
+  res.type('text/plain').send(
+    [
+      'Fraud Detection Backend',
+      'OK',
+      '',
+      'Useful endpoints:',
+      '- GET  /api/health',
+      '- POST /api/upload           (CSV file field: file)',
+      '- POST /api/kyc              (image file field: file, form fields: user_id, name?, aliases?)',
+      '- POST /api/transactions     (JSON: { user_id, transactions: [...] })',
+      '- GET  /api/risk-summary/:id',
+      ''
+    ].join('\n')
+  );
+});
 
 app.listen(PORT, () => {
   console.log(`Fraud backend listening on http://localhost:${PORT}`);

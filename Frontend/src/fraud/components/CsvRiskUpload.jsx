@@ -19,18 +19,45 @@ export default function CsvRiskUpload(){
       if (v === undefined || v === null) return 0;
       const s = String(v).trim();
       if (!s || s === '-' || s === '--') return 0;
-      return Number(s.replace(/[^0-9.-]/g, '')) || 0;
+      // handle amounts like (1,234.56) meaning negative
+      const neg = /\(.*\)/.test(s);
+      const n = Number(s.replace(/[(),]/g, '').replace(/[^0-9.-]/g, '')) || 0;
+      return neg ? -Math.abs(n) : n;
     };
-    const debit = toNum(row.Debit ?? row.debit);
-    const credit = toNum(row.Credit ?? row.credit);
+    const debit = toNum(row.Debit ?? row.debit ?? row['Withdrawal Amt'] ?? row['Withdrawal'] ?? row['Dr']);
+    const credit = toNum(row.Credit ?? row.credit ?? row['Deposit Amt'] ?? row['Deposit'] ?? row['Cr']);
     if (debit || credit) return credit - debit; // signed, credit positive
-    const amt = toNum(row.Amount ?? row.amount ?? row.Amt ?? row.amt);
+    const amt = toNum(row.Amount ?? row.amount ?? row.Amt ?? row.amt ?? row['Transaction Amount'] ?? row['Txn Amount']);
     // If type indicates debit/credit
-    const ty = String(row['Transaction Type'] || row.type || row.Type || row.direction || '').toLowerCase();
+    const ty = String(row['Transaction Type'] || row.type || row.Type || row.direction || row['Dr/Cr'] || '').toLowerCase();
     let a = amt;
     if (amt > 0 && /debit|withdraw/.test(ty)) a = -Math.abs(amt);
-    if (amt > 0 && /credit|deposit/.test(ty)) a = Math.abs(amt);
+    if (amt > 0 && /credit|deposit|cr/.test(ty)) a = Math.abs(amt);
     return a;
+  };
+
+  const parseDate = (raw) => {
+    if (!raw) return null;
+    const s = String(raw).trim();
+    // Try native Date first
+    const d1 = new Date(s);
+    if (!isNaN(d1.getTime())) return d1;
+    // Common dd/mm/yyyy or dd-mm-yyyy
+    const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+    if (m) {
+      const [_, dd, mm, yy] = m;
+      const year = Number(yy.length === 2 ? (Number(yy) + 2000) : yy);
+      const d = new Date(year, Number(mm)-1, Number(dd));
+      if (!isNaN(d.getTime())) return d;
+    }
+    // yyyy-mm-dd without time
+    const m2 = s.match(/^(\d{4})[\-](\d{1,2})[\-](\d{1,2})$/);
+    if (m2) {
+      const [_, y, m, d] = m2;
+      const dt = new Date(Number(y), Number(m)-1, Number(d));
+      if (!isNaN(dt.getTime())) return dt;
+    }
+    return null;
   };
 
   const inferCategory = (desc = '') => {
@@ -52,18 +79,25 @@ export default function CsvRiskUpload(){
     setLocalRisk(null);
     try{
       const rows = await new Promise((resolve, reject) => {
-        Papa.parse(file, { header: true, skipEmptyLines: true, complete: (res)=> resolve(res.data), error: reject });
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: h => (h || '').trim(),
+          complete: (res)=> resolve(res.data),
+          error: reject
+        });
       });
       // Map to expected shape for analyzeTransactions
       const txns = rows
         .map(r => {
           const amount = parseAmount(r);
-          const date = r.date || r.Date || r.timestamp || r.Timestamp || r['Txn Date'] || r['Value Date'] || '';
-          const desc = r.description || r.Description || r.Merchant || r.merchant || '';
+          const dateRaw = r.date || r.Date || r.timestamp || r.Timestamp || r['Txn Date'] || r['Value Date'] || r['Transaction Date'] || r['Posting Date'] || '';
+          const desc = r.description || r.Description || r.Merchant || r.merchant || r.Narration || r['Transaction Remarks'] || r.Details || '';
           // Skip non-movement rows
-          if (!date || amount === 0) return null;
+          const dt = parseDate(dateRaw);
+          if (!dt || amount === 0) return null;
           return {
-            ts: new Date(date).toISOString(),
+            ts: new Date(dt).toISOString(),
             amount: Math.abs(amount),
             merchant: String(desc).slice(0,80) || 'Unknown',
             category: inferCategory(desc),
