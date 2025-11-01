@@ -1,7 +1,11 @@
-const API = import.meta.env.VITE_MENTOR_API || 'http://localhost:4500';
+// Use configured mentor API if provided. In production, avoid falling back to localhost.
+const API_FROM_ENV = import.meta.env.VITE_MENTOR_API;
+const IS_PROD = import.meta.env.PROD;
+const API = IS_PROD ? (API_FROM_ENV || '') : (API_FROM_ENV || 'http://localhost:4500');
 
 export async function mentorChat(text, lang='hi', meta={}){
   try{
+    if (!API) throw new Error('mentor api not configured');
     const res = await fetch(`${API}/api/chat`, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ text, lang, meta })
@@ -25,6 +29,7 @@ export async function mentorChat(text, lang='hi', meta={}){
 
 export async function loadKB(){
   try{
+    if (!API) return; // no-op if mentor API not configured
     const res = await fetch(`${API}/api/kb`);
     const data = await res.json();
     localStorage.setItem('kb_hindi', JSON.stringify(data));

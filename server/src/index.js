@@ -18,6 +18,8 @@ const PORT = process.env.PORT || 4000
 
 // Middleware
 app.use(cors())
+// Handle preflight for all routes (important for Vercel -> Render cross-origin requests)
+app.options('*', cors())
 app.use(bodyParser.json({ limit: '2mb' }))
 app.use(bodyParser.urlencoded({ extended: true }))
 
