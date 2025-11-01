@@ -7,7 +7,9 @@ export default function MentorChatBox() {
   })
   const [text, setText] = useState('EMI kya hota hai?')
   const listRef = useRef(null)
-  const MENTOR_API = import.meta.env.VITE_MENTOR_API || 'http://localhost:4500'
+  const API_FROM_ENV = import.meta.env.VITE_MENTOR_API
+  const IS_PROD = import.meta.env.PROD
+  const MENTOR_API = IS_PROD ? (API_FROM_ENV || '') : (API_FROM_ENV || 'http://localhost:4500')
 
   useEffect(() => { loadKB() }, [])
   useEffect(() => { listRef.current?.scrollTo(0, listRef.current.scrollHeight) }, [items])
