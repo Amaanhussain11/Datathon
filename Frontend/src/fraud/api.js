@@ -15,7 +15,8 @@ export async function uploadKyc(user_id, file, name='', aliases=null){
     }
   }
   form.append('file', file);
-  const { data } = await axios.post(`${API}/api/kyc`, form, { headers: { 'Content-Type': 'multipart/form-data' } });
+  // Let the browser set the correct multipart boundary header
+  const { data } = await axios.post(`${API}/api/kyc`, form);
   return data;
 }
 

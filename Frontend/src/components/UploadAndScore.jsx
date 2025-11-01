@@ -45,7 +45,7 @@ export default function UploadAndScore() {
   const [ocrInfo, setOcrInfo] = useState('')
   const [imageFile, setImageFile] = useState(null)
   const [dragOver, setDragOver] = useState(false)
-  const SERVER = 'http://localhost:4000'
+  const SERVER = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000'
 
   const parseInput = () => {
     try {

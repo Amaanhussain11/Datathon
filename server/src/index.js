@@ -35,6 +35,6 @@ app.get('/', (req, res) => {
   res.json({ ok: true, message: 'Alt Credit Scoring Server' })
 })
 
-app.listen(PORT, () => {
+app.listen(PORT,'0.0.0.0', () => {
   console.log(`Server listening on http://localhost:${PORT}`)
 })

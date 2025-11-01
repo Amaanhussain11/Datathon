@@ -15,6 +15,8 @@ const app = express();
 const PORT = process.env.PORT || 4800;
 
 app.use(cors());
+// Handle CORS preflight for all routes
+app.options('*', cors());
 app.use(express.json({ limit: '2mb' }));
 
 // Mongo connection (optional). If no URI, continue without failing.

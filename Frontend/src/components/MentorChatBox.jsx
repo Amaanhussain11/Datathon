@@ -7,6 +7,7 @@ export default function MentorChatBox() {
   })
   const [text, setText] = useState('EMI kya hota hai?')
   const listRef = useRef(null)
+  const MENTOR_API = import.meta.env.VITE_MENTOR_API || 'http://localhost:4500'
 
   useEffect(() => { loadKB() }, [])
   useEffect(() => { listRef.current?.scrollTo(0, listRef.current.scrollHeight) }, [items])
@@ -21,7 +22,7 @@ export default function MentorChatBox() {
       const res = await mentorChat(mine.text, 'hi', meta)
       setItems(x => [...x, { who: 'bot', text: res.answer, meta: res.meta || {} }])
     } catch (e) {
-      setItems(x => [...x, { who: 'bot', text: 'Network issue. Try again or check mentor backend (port 4500).', meta: {} }])
+      setItems(x => [...x, { who: 'bot', text: 'Network issue. Try again or check mentor backend availability.', meta: {} }])
     }
   }
 
@@ -35,7 +36,7 @@ export default function MentorChatBox() {
     <div className="panel">
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8}}>
         <h2 style={{margin:0}}>AI Mentor (Hindi/Hinglish)</h2>
-        <span className="pill">API: http://localhost:4500</span>
+        <span className="pill">API: {MENTOR_API}</span>
       </div>
       <div className="row">
         <div className="col">
